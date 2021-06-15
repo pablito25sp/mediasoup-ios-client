@@ -232,4 +232,10 @@ using namespace mediasoupclient;
     return transport;
 }
 
+
++(void)nativeFreeTransport:(NSValue *)nativeTransport {
+    MSC_TRACE();
+    delete reinterpret_cast<mediasoupclient::Transport *>([nativeTransport pointerValue]);
+}
+
 @end
