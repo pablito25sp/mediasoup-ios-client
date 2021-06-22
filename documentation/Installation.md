@@ -4,9 +4,9 @@
 
 ### Get depot tools
 
-Follow the below guide to install depot_tools: 
+Follow the below guide to install depot_tools:
 
- https://webrtc.org/native-code/development/prerequisite-sw/ 
+ https://webrtc.org/native-code/development/prerequisite-sw/
 
 ---
 
@@ -22,12 +22,6 @@ git checkout -b m84 refs/remotes/branch-heads/4147
 gclient sync
 ```
 
----
-## If you pulled WebRTC repo as the step above, apply this patch so compilation works
-https://github.com/ethand91/webrtc-mac-src/commit/58c5047b4c5f412dd7dfdf523ea5a5eb3f80d932
-
----
-
 ## Enable VP9 codec (Optional)
 
 ```bash
@@ -35,7 +29,6 @@ vim tools_webrtc/ios/build_ios_libs.py
 
 # change "LIBVPX_BUILD_VP9" from False to True
 ```
-
 
 
 ## Build the iOS WebRTC Universal Framework
@@ -53,6 +46,7 @@ ninja -C arm64_libs/ webrtc
 ninja -C x64_libs/ webrtc
 
 # Create a FAT libwebrtc static library
+mkdir universal
 lipo -create arm64_libs/obj/libwebrtc.a x64_libs/obj/libwebrtc.a -output universal/libwebrtc.a
 # Check with lipo -info universal/libwebrtc.a
 ```
@@ -90,4 +84,8 @@ lipo -create build/libmediasoupclient/libsdptransform/libsdptransform.a build_86
 
 Once build include the libwebrtc.a, libmediasoup.a, libsdptransform.a in the project
 
+---
+## If you pulled WebRTC repo, apply this patch so compilation works
+https://github.com/ethand91/webrtc-mac-src/commit/58c5047b4c5f412dd7dfdf523ea5a5eb3f80d932
 
+---

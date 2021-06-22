@@ -42,7 +42,7 @@
 
 -(void)checkTransportExists {
     if (self._nativeTransport == nil) {
-        NSException* exception = [NSException exceptionWithName:@"IllegalStateException" reason:@"RecvTransport has been disposed." userInfo:nil];
+        NSException* exception = [NSException exceptionWithName:@"IllegalStateException" reason:@"SendTransport has been disposed." userInfo:nil];
         
         throw exception;
     }
