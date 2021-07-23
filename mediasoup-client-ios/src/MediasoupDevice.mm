@@ -29,8 +29,16 @@ NSString * const ERR_DOMAIN = @"mediasup-client-ios.MediasoupDevice";
     return NO;
   }
 
-  [DeviceWrapper nativeLoad:self._nativeDevice routerRtpCapabilities:routerRtpCapabilities];
-  return YES;
+  @try {
+    [DeviceWrapper nativeLoad:self._nativeDevice routerRtpCapabilities:routerRtpCapabilities];
+    return YES;
+  }
+  @catch (NSException *exception) {
+    if (errPtr) {
+      *errPtr = [NSError errorWithDomain:ERR_DOMAIN code:LoadError userInfo:nil];
+    }
+    return NO;
+  }
 }
 
 -(bool)isLoaded {
@@ -56,7 +64,15 @@ NSString * const ERR_DOMAIN = @"mediasup-client-ios.MediasoupDevice";
     return nil;
   }
 
-  return [DeviceWrapper nativeGetRtpCapabilities:self._nativeDevice];
+  @try {
+    return [DeviceWrapper nativeGetRtpCapabilities:self._nativeDevice];
+  }
+  @catch (NSException *exception) {
+    if (errPtr) {
+      *errPtr = [NSError errorWithDomain:ERR_DOMAIN code:RuntimeError userInfo:nil];
+    }
+    return nil;
+  }
 }
 
 -(NSString *)getSctpCapabilities:(NSError **)errPtr {
@@ -74,7 +90,15 @@ NSString * const ERR_DOMAIN = @"mediasup-client-ios.MediasoupDevice";
     return nil;
   }
 
-  return [DeviceWrapper nativeGetSctpCapabilities:self._nativeDevice];
+  @try {
+    return [DeviceWrapper nativeGetSctpCapabilities:self._nativeDevice];
+  }
+  @catch (NSException *exception) {
+    if (errPtr) {
+      *errPtr = [NSError errorWithDomain:ERR_DOMAIN code:RuntimeError userInfo:nil];
+    }
+    return nil;
+  }
 }
 
 -(bool)canProduce:(NSString *)kind {
@@ -82,18 +106,16 @@ NSString * const ERR_DOMAIN = @"mediasup-client-ios.MediasoupDevice";
     return false;
   }
   
-  return [DeviceWrapper nativeCanProduce:self._nativeDevice kind:kind];
+  @try {
+    return [DeviceWrapper nativeCanProduce:self._nativeDevice kind:kind];
+  }
+  @catch (NSException *exception) {
+    return false;
+  }
 }
 
 -(SendTransport *)createSendTransport:(id<SendTransportListener>)listener id:(NSString *)id iceParameters:(NSString *)iceParameters iceCandidates:(NSString *)iceCandidates dtlsParameters:(NSString *)dtlsParameters error:(NSError **)errPtr {
-  if (![self deviceExists]) {
-    if (errPtr) {
-      *errPtr = [NSError errorWithDomain:ERR_DOMAIN code:NativeDeviceDisposedError userInfo:nil];
-    }
-    return nil;
-  }
-
-  return [self createSendTransport:listener id:id iceParameters:iceParameters iceCandidates:iceCandidates dtlsParameters:dtlsParameters sctpParameters:nil options:nil appData:nil error:nil];
+  return [self createSendTransport:listener id:id iceParameters:iceParameters iceCandidates:iceCandidates dtlsParameters:dtlsParameters sctpParameters:nil options:nil appData:nil error:errPtr];
 }
 
 -(SendTransport *)createSendTransport:(id<SendTransportListener>)listener id:(NSString *)id iceParameters:(NSString *)iceParameters iceCandidates:(NSString *)iceCandidates dtlsParameters:(NSString *)dtlsParameters sctpParameters:(NSString *)sctpParameters options:(RTCPeerConnectionFactoryOptions *)options appData:(NSString *)appData error:(NSError **)errPtr {
@@ -104,20 +126,20 @@ NSString * const ERR_DOMAIN = @"mediasup-client-ios.MediasoupDevice";
     return nil;
   }
 
-  NSObject *transport = [DeviceWrapper nativeCreateSendTransport:self._nativeDevice listener:listener id:id iceParameters:iceParameters iceCandidates:iceCandidates dtlsParameters:dtlsParameters sctpParameters:sctpParameters options:options appData:appData];
-  
-  return [[SendTransport alloc] initWithNativeTransport:transport];
-}
-
--(RecvTransport *)createRecvTransport:(id<RecvTransportListener>)listener id:(NSString *)id iceParameters:(NSString *)iceParameters iceCandidates:(NSString *)iceCandidates dtlsParameters:(NSString *)dtlsParameters error:(NSError **)errPtr {
-  if (![self deviceExists]) {
+  @try {
+    NSObject *transport = [DeviceWrapper nativeCreateSendTransport:self._nativeDevice listener:listener id:id iceParameters:iceParameters iceCandidates:iceCandidates dtlsParameters:dtlsParameters sctpParameters:sctpParameters options:options appData:appData];
+    return [[SendTransport alloc] initWithNativeTransport:transport];
+  }
+  @catch (NSException *exception) {
     if (errPtr) {
-      *errPtr = [NSError errorWithDomain:ERR_DOMAIN code:NativeDeviceDisposedError userInfo:nil];
+      *errPtr = [NSError errorWithDomain:ERR_DOMAIN code:RuntimeError userInfo:nil];
     }
     return nil;
   }
+}
 
-  return [self createRecvTransport:listener id:id iceParameters:iceParameters iceCandidates:iceCandidates dtlsParameters:dtlsParameters sctpParameters:nil options:nil appData:nil error:nil];
+-(RecvTransport *)createRecvTransport:(id<RecvTransportListener>)listener id:(NSString *)id iceParameters:(NSString *)iceParameters iceCandidates:(NSString *)iceCandidates dtlsParameters:(NSString *)dtlsParameters error:(NSError **)errPtr {
+  return [self createRecvTransport:listener id:id iceParameters:iceParameters iceCandidates:iceCandidates dtlsParameters:dtlsParameters sctpParameters:nil options:nil appData:nil error:errPtr];
 }
 
 -(RecvTransport *)createRecvTransport:(id<RecvTransportListener>)listener id:(NSString *)id iceParameters:(NSString *)iceParameters iceCandidates:(NSString *)iceCandidates dtlsParameters:(NSString *)dtlsParameters sctpParameters:(NSString *)sctpParameters options:(RTCPeerConnectionFactoryOptions *)options appData:(NSString *)appData error:(NSError **)errPtr {
@@ -128,9 +150,16 @@ NSString * const ERR_DOMAIN = @"mediasup-client-ios.MediasoupDevice";
     return nil;
   }
 
-  NSObject *transport = [DeviceWrapper nativeCreateRecvTransport:self._nativeDevice listener:listener id:id iceParameters:iceParameters iceCandidates:iceCandidates dtlsParameters:dtlsParameters sctpParameters:sctpParameters options:options appData:appData];
-  
-  return [[RecvTransport alloc] initWithNativeTransport:transport];
+  @try {
+    NSObject *transport = [DeviceWrapper nativeCreateRecvTransport:self._nativeDevice listener:listener id:id iceParameters:iceParameters iceCandidates:iceCandidates dtlsParameters:dtlsParameters sctpParameters:sctpParameters options:options appData:appData];
+    return [[RecvTransport alloc] initWithNativeTransport:transport];
+  }
+  @catch (NSException *exception) {
+    if (errPtr) {
+      *errPtr = [NSError errorWithDomain:ERR_DOMAIN code:RuntimeError userInfo:nil];
+    }
+    return nil;
+  }
 }
 
 -(bool)deviceExists {
