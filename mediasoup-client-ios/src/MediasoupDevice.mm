@@ -11,42 +11,64 @@
 
 @implementation MediasoupDevice : NSObject
 
+NSString * const ERR_DOMAIN = @"mediasup-client-ios.MediasoupDevice";
+
 -(instancetype)init {
-    self = [super init];
-    if (self) {
-        self._nativeDevice = [DeviceWrapper nativeNewDevice];
-    }
-    
-    return self;
+  self = [super init];
+  if (self) {
+    self._nativeDevice = [DeviceWrapper nativeNewDevice];
+  }
+  return self;
 }
 
--(void)load:(NSString *)routerRtpCapabilities {
-    [self checkDeviceExists];
-    [DeviceWrapper nativeLoad:self._nativeDevice routerRtpCapabilities:routerRtpCapabilities];
+-(BOOL)load:(NSString *)routerRtpCapabilities error:(NSError **)errPtr {
+  if (![self deviceExists]) {
+    if (errPtr) {
+      *errPtr = [NSError errorWithDomain:ERR_DOMAIN code:NativeDeviceDisposedError userInfo:nil];
+    }
+    return NO;
+  }
+
+  [DeviceWrapper nativeLoad:self._nativeDevice routerRtpCapabilities:routerRtpCapabilities];
+  return YES;
 }
 
 -(bool)isLoaded {
-    [self checkDeviceExists];
-    
-    return [DeviceWrapper nativeIsLoaded:self._nativeDevice];
+  if (![self deviceExists]) {
+    return false;
+  }
+  
+  return [DeviceWrapper nativeIsLoaded:self._nativeDevice];
 }
 
--(NSString *)getRtpCapabilities {
-    [self checkDeviceExists];
-    
-    return [DeviceWrapper nativeGetRtpCapabilities:self._nativeDevice];
+-(NSString *)getRtpCapabilities:(NSError **)errPtr {
+  if (![self deviceExists]) {
+    if (errPtr) {
+      *errPtr = [NSError errorWithDomain:ERR_DOMAIN code:NativeDeviceDisposedError userInfo:nil];
+    }
+    return nil;
+  }
+
+  return [DeviceWrapper nativeGetRtpCapabilities:self._nativeDevice];
 }
 
--(NSString *)getSctpCapabilities {
-    [self checkDeviceExists];
-    
-    return [DeviceWrapper nativeGetSctpCapabilities:self._nativeDevice];
+-(NSString *)getSctpCapabilities:(NSError **)errPtr {
+  if (![self deviceExists]) {
+    if (errPtr) {
+      *errPtr = [NSError errorWithDomain:ERR_DOMAIN code:NativeDeviceDisposedError userInfo:nil];
+    }
+    return nil;
+  }
+
+  return [DeviceWrapper nativeGetSctpCapabilities:self._nativeDevice];
 }
 
 -(bool)canProduce:(NSString *)kind {
-    [self checkDeviceExists];
-    
-    return [DeviceWrapper nativeCanProduce:self._nativeDevice kind:kind];
+  if (![self deviceExists]) {
+    return false;
+  }
+  
+  return [DeviceWrapper nativeCanProduce:self._nativeDevice kind:kind];
 }
 
 -(SendTransport *)createSendTransport:(id<SendTransportListener>)listener id:(NSString *)id iceParameters:(NSString *)iceParameters iceCandidates:(NSString *)iceCandidates dtlsParameters:(NSString *)dtlsParameters {
@@ -79,6 +101,10 @@
         
         throw exception;
     }
+}
+
+-(bool)deviceExists {
+  return self._nativeDevice != nil;
 }
 
 @end
