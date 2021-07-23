@@ -15,7 +15,8 @@
 #define MediasoupDevice_h
 
 enum {
-  NativeDeviceDisposedError = 1
+  NativeDeviceDisposedError = 1,
+  NotLoadedError = 1
 };
 
 @interface MediasoupDevice : NSObject
@@ -68,7 +69,7 @@ enum {
     @param dtlsParameters DTLS parameters of the server side transport
     @return SendTransport
  */
--(SendTransport *)createSendTransport:(id<SendTransportListener>)listener id:(NSString *)id iceParameters:(NSString *)iceParameters iceCandidates:(NSString *)iceCandidates dtlsParameters:(NSString *)dtlsParameters;
+-(SendTransport *)createSendTransport:(id<SendTransportListener>)listener id:(NSString *)id iceParameters:(NSString *)iceParameters iceCandidates:(NSString *)iceCandidates dtlsParameters:(NSString *)dtlsParameters error:(NSError **)errPtr;
 /*!
    @brief Creates a new WebRTC transport to <b>send</b> media
    @discussion The transport must be previously created in the mediasoup router
@@ -82,7 +83,7 @@ enum {
    @param appData Custom application data
    @return SendTransport
 */
--(SendTransport *)createSendTransport:(id<SendTransportListener>)listener id:(NSString *)id iceParameters:(NSString *)iceParameters iceCandidates:(NSString *)iceCandidates dtlsParameters:(NSString *)dtlsParameters sctpParameters:(NSString *)sctpParameters options:(RTCPeerConnectionFactoryOptions *)options appData:(NSString *)appData;
+-(SendTransport *)createSendTransport:(id<SendTransportListener>)listener id:(NSString *)id iceParameters:(NSString *)iceParameters iceCandidates:(NSString *)iceCandidates dtlsParameters:(NSString *)dtlsParameters sctpParameters:(NSString *)sctpParameters options:(RTCPeerConnectionFactoryOptions *)options appData:(NSString *)appData error:(NSError **)errPtr;
 /*!
     @brief Creates a new WebRTC transport to <b>receive</b> media
     @discussion The transport must be previously created in the mediasoup router
@@ -93,7 +94,7 @@ enum {
     @param dtlsParameters DTLS parameters of the server side transport
     @return RecvTransport
  */
--(RecvTransport *)createRecvTransport:(id<RecvTransportListener>)listener id:(NSString *)id iceParameters:(NSString *)iceParameters iceCandidates:(NSString *)iceCandidates dtlsParameters:(NSString *)dtlsParameters;
+-(RecvTransport *)createRecvTransport:(id<RecvTransportListener>)listener id:(NSString *)id iceParameters:(NSString *)iceParameters iceCandidates:(NSString *)iceCandidates dtlsParameters:(NSString *)dtlsParameters error:(NSError **)errPtr;
 /*!
    @brief Creates a new WebRTC transport to <b>receive</b> media
    @discussion The transport must be previously created in the mediasoup router
@@ -107,7 +108,7 @@ enum {
    @param appData Custom application data
    @return RecvTransport
 */
--(RecvTransport *)createRecvTransport:(id<RecvTransportListener>)listener id:(NSString *)id iceParameters:(NSString *)iceParameters iceCandidates:(NSString *)iceCandidates dtlsParameters:(NSString *)dtlsParameters sctpParameters:(NSString *)sctpParameters options:(RTCPeerConnectionFactoryOptions *)options appData:(NSString *)appData;
+-(RecvTransport *)createRecvTransport:(id<RecvTransportListener>)listener id:(NSString *)id iceParameters:(NSString *)iceParameters iceCandidates:(NSString *)iceCandidates dtlsParameters:(NSString *)dtlsParameters sctpParameters:(NSString *)sctpParameters options:(RTCPeerConnectionFactoryOptions *)options appData:(NSString *)appData error:(NSError **)errPtr;
 @end
 
 #endif /* Device_h */
