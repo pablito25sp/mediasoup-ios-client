@@ -6,6 +6,7 @@
 //  Copyright © 2019 Ethan. All rights reserved.
 //
 
+#import "Error.h"
 #import "MediasoupDevice.h"
 #import "DeviceWrapper.h"
 
@@ -24,7 +25,7 @@ NSString * const ERR_DOMAIN = @"mediasup-client-ios.MediasoupDevice";
 -(BOOL)load:(NSString *)routerRtpCapabilities error:(NSError **)errPtr {
   if (![self deviceExists]) {
     if (errPtr) {
-      *errPtr = [NSError errorWithDomain:ERR_DOMAIN code:NativeDeviceDisposedError userInfo:nil];
+      *errPtr = [NSError errorWithDomain:ERR_DOMAIN code:NativeDisposedError userInfo:nil];
     }
     return NO;
   }
@@ -52,7 +53,7 @@ NSString * const ERR_DOMAIN = @"mediasup-client-ios.MediasoupDevice";
 -(NSString *)getRtpCapabilities:(NSError **)errPtr {
   if (![self deviceExists]) {
     if (errPtr) {
-      *errPtr = [NSError errorWithDomain:ERR_DOMAIN code:NativeDeviceDisposedError userInfo:nil];
+      *errPtr = [NSError errorWithDomain:ERR_DOMAIN code:NativeDisposedError userInfo:nil];
     }
     return nil;
   }
@@ -78,7 +79,7 @@ NSString * const ERR_DOMAIN = @"mediasup-client-ios.MediasoupDevice";
 -(NSString *)getSctpCapabilities:(NSError **)errPtr {
   if (![self deviceExists]) {
     if (errPtr) {
-      *errPtr = [NSError errorWithDomain:ERR_DOMAIN code:NativeDeviceDisposedError userInfo:nil];
+      *errPtr = [NSError errorWithDomain:ERR_DOMAIN code:NativeDisposedError userInfo:nil];
     }
     return nil;
   }
@@ -121,7 +122,7 @@ NSString * const ERR_DOMAIN = @"mediasup-client-ios.MediasoupDevice";
 -(SendTransport *)createSendTransport:(id<SendTransportListener>)listener id:(NSString *)id iceParameters:(NSString *)iceParameters iceCandidates:(NSString *)iceCandidates dtlsParameters:(NSString *)dtlsParameters sctpParameters:(NSString *)sctpParameters options:(RTCPeerConnectionFactoryOptions *)options appData:(NSString *)appData error:(NSError **)errPtr {
   if (![self deviceExists]) {
     if (errPtr) {
-      *errPtr = [NSError errorWithDomain:ERR_DOMAIN code:NativeDeviceDisposedError userInfo:nil];
+      *errPtr = [NSError errorWithDomain:ERR_DOMAIN code:NativeDisposedError userInfo:nil];
     }
     return nil;
   }
@@ -145,7 +146,7 @@ NSString * const ERR_DOMAIN = @"mediasup-client-ios.MediasoupDevice";
 -(RecvTransport *)createRecvTransport:(id<RecvTransportListener>)listener id:(NSString *)id iceParameters:(NSString *)iceParameters iceCandidates:(NSString *)iceCandidates dtlsParameters:(NSString *)dtlsParameters sctpParameters:(NSString *)sctpParameters options:(RTCPeerConnectionFactoryOptions *)options appData:(NSString *)appData error:(NSError **)errPtr {
   if (![self deviceExists]) {
     if (errPtr) {
-      *errPtr = [NSError errorWithDomain:ERR_DOMAIN code:NativeDeviceDisposedError userInfo:nil];
+      *errPtr = [NSError errorWithDomain:ERR_DOMAIN code:NativeDisposedError userInfo:nil];
     }
     return nil;
   }

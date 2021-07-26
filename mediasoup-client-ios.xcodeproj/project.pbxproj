@@ -22,6 +22,7 @@
 
 /* Begin PBXBuildFile section */
 		2F6EBD0D268279A000E51BFE /* WebRTC.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2F6EBD0C268279A000E51BFE /* WebRTC.framework */; };
+		2FD8F19F26AEDBE50057F6DB /* Error.h in Headers */ = {isa = PBXBuildFile; fileRef = 2FD8F19E26AEDBE50057F6DB /* Error.h */; };
 		3519FB1E24872D1200DD3AF5 /* libmediasoupclient.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 35516F352408C0EE00AC60B4 /* libmediasoupclient.a */; };
 		3519FB1F24872D3300DD3AF5 /* libsdptransform.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 35516F332408C0D500AC60B4 /* libsdptransform.a */; };
 		3519FB2024872D5600DD3AF5 /* libwebrtc.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 35516F372408C11000AC60B4 /* libwebrtc.a */; };
@@ -59,6 +60,7 @@
 
 /* Begin PBXFileReference section */
 		2F6EBD0C268279A000E51BFE /* WebRTC.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebRTC.framework; path = "mediasoup-client-ios/dependencies/webrtc/src/out_ios_libs/universal/WebRTC.framework"; sourceTree = "<group>"; };
+		2FD8F19E26AEDBE50057F6DB /* Error.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Error.h; sourceTree = "<group>"; };
 		2FE22FED26702F6A00E7E6AB /* CoreAudioTypes.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudioTypes.framework; path = System/Library/Frameworks/CoreAudioTypes.framework; sourceTree = SDKROOT; };
 		351A83202394A4BA00BA7A13 /* Transport.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Transport.h; sourceTree = "<group>"; };
 		351A83212394A68700BA7A13 /* Transport.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = Transport.mm; sourceTree = "<group>"; };
@@ -229,6 +231,7 @@
 				351A832D2394B09600BA7A13 /* Producer.h */,
 				351A83392394DC6A00BA7A13 /* SendTransport.h */,
 				351A833A2394DC7300BA7A13 /* RecvTransport.h */,
+				2FD8F19E26AEDBE50057F6DB /* Error.h */,
 			);
 			path = include;
 			sourceTree = "<group>";
@@ -255,6 +258,7 @@
 				351A833C2394DC7900BA7A13 /* RecvTransport.h in Headers */,
 				3570311C2397802C00761AF5 /* LoggerWrapper.h in Headers */,
 				35D762DD238CBA2C0033D7AD /* ConsumerWrapper.h in Headers */,
+				2FD8F19F26AEDBE50057F6DB /* Error.h in Headers */,
 				351A833B2394DC7700BA7A13 /* SendTransport.h in Headers */,
 				3570311A23977E0F00761AF5 /* MediasoupLogger.h in Headers */,
 				351A83282394AF7C00BA7A13 /* MediasoupclientWrapper.h in Headers */,
