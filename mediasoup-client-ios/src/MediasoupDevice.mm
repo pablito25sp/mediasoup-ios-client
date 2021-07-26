@@ -127,6 +127,13 @@ NSString * const ERR_DOMAIN = @"mediasup-client-ios.MediasoupDevice";
     return nil;
   }
 
+  if (![self isLoaded]) {
+    if (errPtr) {
+      *errPtr = [NSError errorWithDomain:ERR_DOMAIN code:NotLoadedError userInfo:nil];
+    }
+    return nil;
+  }
+
   @try {
     NSObject *transport = [DeviceWrapper nativeCreateSendTransport:self._nativeDevice listener:listener id:id iceParameters:iceParameters iceCandidates:iceCandidates dtlsParameters:dtlsParameters sctpParameters:sctpParameters options:options appData:appData];
     return [[SendTransport alloc] initWithNativeTransport:transport];
@@ -147,6 +154,13 @@ NSString * const ERR_DOMAIN = @"mediasup-client-ios.MediasoupDevice";
   if (![self deviceExists]) {
     if (errPtr) {
       *errPtr = [NSError errorWithDomain:ERR_DOMAIN code:NativeDisposedError userInfo:nil];
+    }
+    return nil;
+  }
+
+  if (![self isLoaded]) {
+    if (errPtr) {
+      *errPtr = [NSError errorWithDomain:ERR_DOMAIN code:NotLoadedError userInfo:nil];
     }
     return nil;
   }
