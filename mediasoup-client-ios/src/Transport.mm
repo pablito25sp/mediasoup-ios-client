@@ -88,7 +88,7 @@
 -(void)close {
   if ([self transportExists]) {
     [TransportWrapper nativeClose:self._nativeTransport];
-    [self._nativeTransport release];
+    // [self._nativeTransport release];
   }
 }
 
