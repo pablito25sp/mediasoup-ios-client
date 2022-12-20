@@ -84,6 +84,16 @@ lipo -create build/libmediasoupclient/libsdptransform/libsdptransform.a build_86
 
 Once build include the libwebrtc.a, libmediasoup.a, libsdptransform.a in the project
 
+## clean and build mediasoup-ios-client
+move to the root of the project
+```
+rm -rf build/*
+
+xcodebuild -project mediasoup-client-ios.xcodeproj -scheme mediasoup-client-ios -configuration Release -arch arm64 only_active_arch=no -sdk "iphoneos" -derivedDataPath build
+
+xcodebuild -project mediasoup-client-ios.xcodeproj -scheme mediasoup-client-ios -configuration Release -arch x86_64 only_active_arch=no -sdk "iphonesimulator" -derivedDataPath build
+```
+
 ---
 ## If you pulled WebRTC repo, apply this patch so compilation works
 https://github.com/ethand91/webrtc-mac-src/commit/58c5047b4c5f412dd7dfdf523ea5a5eb3f80d932

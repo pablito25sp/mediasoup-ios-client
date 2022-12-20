@@ -7,51 +7,93 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "Error.h"
 #import "Transport.h"
 #import "TransportWrapper.h"
 
 @implementation Transport : NSObject
 
 -(instancetype)initWithNativeTransport:(NSValue *)nativeTransport {
-    self = [super init];
-    if (self) {
-        self._nativeTransport = nativeTransport;
-    }
-    
-    return self;
+  self = [super init];
+  if (self) {
+    self._nativeTransport = nativeTransport;
+  }
+  return self;
 }
 
 -(NSString *)getId {
+  if ([self transportExists]) {
     return [TransportWrapper getNativeId:self._nativeTransport];
+  } else {
+    return nil;
+  }
 }
 
 -(NSString *)getConnectionState {
+  if ([self transportExists]) {
     return [TransportWrapper getNativeConnectionState:self._nativeTransport];
+  } else {
+    return nil;
+  }
 }
 
 -(NSString *)getAppData {
+  if ([self transportExists]) {
     return [TransportWrapper getNativeAppData:self._nativeTransport];
+  } else {
+    return nil;
+  }
 }
 
 -(NSString *)getStats {
-    return [TransportWrapper getNativeStats:self._nativeTransport];
+  if ([self transportExists]) {
+    @try {
+      return [TransportWrapper getNativeStats:self._nativeTransport];
+    } @catch (NSException *exception) {
+      return nil;
+    }
+  } else {
+    return nil;
+  }
 }
 
 -(bool)isClosed {
+  if ([self transportExists]) {
     return [TransportWrapper isNativeClosed:self._nativeTransport];
+  } else {
+    return true;
+  }
 }
 
 -(void)restartIce:(NSString *)iceParameters {
-    [TransportWrapper nativeRestartIce:self._nativeTransport iceParameters:iceParameters];
+  if ([self transportExists]) {
+    @try {
+      [TransportWrapper nativeRestartIce:self._nativeTransport iceParameters:iceParameters];
+    } @catch (NSException *exception) {
+      // should change this method and return something?
+    }
+  }
 }
 
 -(void)updateIceServers:(NSString *)iceServers {
-    [TransportWrapper nativeUpdateIceServers:self._nativeTransport iceServers:iceServers];
+  if ([self transportExists]) {
+    @try {
+      [TransportWrapper nativeUpdateIceServers:self._nativeTransport iceServers:iceServers];
+    } @catch (NSException *exception) {
+      // should change this method and return something?
+    }
+  }
 }
 
 -(void)close {
+  if ([self transportExists]) {
     [TransportWrapper nativeClose:self._nativeTransport];
-    [self._nativeTransport release];
+    // [self._nativeTransport release];
+  }
+}
+
+-(bool)transportExists {
+  return self._nativeTransport != nil;
 }
 
 @end

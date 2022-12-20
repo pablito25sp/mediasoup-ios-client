@@ -6,79 +6,179 @@
 //  Copyright © 2019 Ethan. All rights reserved.
 //
 
+#import "Error.h"
 #import "MediasoupDevice.h"
 #import "DeviceWrapper.h"
 
 @implementation MediasoupDevice : NSObject
 
+NSString * const ERR_DOMAIN = @"mediasup-client-ios.MediasoupDevice";
+
 -(instancetype)init {
-    self = [super init];
-    if (self) {
-        self._nativeDevice = [DeviceWrapper nativeNewDevice];
-    }
-    
-    return self;
+  self = [super init];
+  if (self) {
+    self._nativeDevice = [DeviceWrapper nativeNewDevice];
+  }
+  return self;
 }
 
--(void)load:(NSString *)routerRtpCapabilities {
-    [self checkDeviceExists];
+-(BOOL)load:(NSString *)routerRtpCapabilities error:(NSError **)errPtr {
+  if (![self deviceExists]) {
+    if (errPtr) {
+      *errPtr = [NSError errorWithDomain:ERR_DOMAIN code:NativeDisposedError userInfo:nil];
+    }
+    return NO;
+  }
+
+  @try {
     [DeviceWrapper nativeLoad:self._nativeDevice routerRtpCapabilities:routerRtpCapabilities];
+    return YES;
+  }
+  @catch (NSException *exception) {
+    if (errPtr) {
+      *errPtr = [NSError errorWithDomain:ERR_DOMAIN code:LoadError userInfo:nil];
+    }
+    return NO;
+  }
 }
 
 -(bool)isLoaded {
-    [self checkDeviceExists];
-    
-    return [DeviceWrapper nativeIsLoaded:self._nativeDevice];
+  if (![self deviceExists]) {
+    return false;
+  }
+  
+  return [DeviceWrapper nativeIsLoaded:self._nativeDevice];
 }
 
--(NSString *)getRtpCapabilities {
-    [self checkDeviceExists];
-    
+-(NSString *)getRtpCapabilities:(NSError **)errPtr {
+  if (![self deviceExists]) {
+    if (errPtr) {
+      *errPtr = [NSError errorWithDomain:ERR_DOMAIN code:NativeDisposedError userInfo:nil];
+    }
+    return nil;
+  }
+
+  if (![self isLoaded]) {
+    if (errPtr) {
+      *errPtr = [NSError errorWithDomain:ERR_DOMAIN code:NotLoadedError userInfo:nil];
+    }
+    return nil;
+  }
+
+  @try {
     return [DeviceWrapper nativeGetRtpCapabilities:self._nativeDevice];
+  }
+  @catch (NSException *exception) {
+    if (errPtr) {
+      *errPtr = [NSError errorWithDomain:ERR_DOMAIN code:RuntimeError userInfo:nil];
+    }
+    return nil;
+  }
 }
 
--(NSString *)getSctpCapabilities {
-    [self checkDeviceExists];
-    
+-(NSString *)getSctpCapabilities:(NSError **)errPtr {
+  if (![self deviceExists]) {
+    if (errPtr) {
+      *errPtr = [NSError errorWithDomain:ERR_DOMAIN code:NativeDisposedError userInfo:nil];
+    }
+    return nil;
+  }
+
+  if (![self isLoaded]) {
+    if (errPtr) {
+      *errPtr = [NSError errorWithDomain:ERR_DOMAIN code:NotLoadedError userInfo:nil];
+    }
+    return nil;
+  }
+
+  @try {
     return [DeviceWrapper nativeGetSctpCapabilities:self._nativeDevice];
+  }
+  @catch (NSException *exception) {
+    if (errPtr) {
+      *errPtr = [NSError errorWithDomain:ERR_DOMAIN code:RuntimeError userInfo:nil];
+    }
+    return nil;
+  }
 }
 
 -(bool)canProduce:(NSString *)kind {
-    [self checkDeviceExists];
-    
+  if (![self deviceExists]) {
+    return false;
+  }
+  
+  @try {
     return [DeviceWrapper nativeCanProduce:self._nativeDevice kind:kind];
+  }
+  @catch (NSException *exception) {
+    return false;
+  }
 }
 
--(SendTransport *)createSendTransport:(id<SendTransportListener>)listener id:(NSString *)id iceParameters:(NSString *)iceParameters iceCandidates:(NSString *)iceCandidates dtlsParameters:(NSString *)dtlsParameters {
-    return [self createSendTransport:listener id:id iceParameters:iceParameters iceCandidates:iceCandidates dtlsParameters:dtlsParameters sctpParameters:nil options:nil appData:nil];
+-(SendTransport *)createSendTransport:(id<SendTransportListener>)listener id:(NSString *)id iceParameters:(NSString *)iceParameters iceCandidates:(NSString *)iceCandidates dtlsParameters:(NSString *)dtlsParameters error:(NSError **)errPtr {
+  return [self createSendTransport:listener id:id iceParameters:iceParameters iceCandidates:iceCandidates dtlsParameters:dtlsParameters sctpParameters:nil options:nil appData:nil error:errPtr];
 }
 
--(SendTransport *)createSendTransport:(id<SendTransportListener>)listener id:(NSString *)id iceParameters:(NSString *)iceParameters iceCandidates:(NSString *)iceCandidates dtlsParameters:(NSString *)dtlsParameters sctpParameters:(NSString *)sctpParameters options:(RTCPeerConnectionFactoryOptions *)options appData:(NSString *)appData {
-    [self checkDeviceExists];
-    
-    NSObject *transport = [DeviceWrapper nativeCreateSendTransport:self._nativeDevice listener:listener id:id iceParameters:iceParameters iceCandidates:iceCandidates dtlsParameters:dtlsParameters sctpParameters:sctpParameters options:options appData:appData];
-    
-    return [[SendTransport alloc] initWithNativeTransport:transport];
-}
-
--(RecvTransport *)createRecvTransport:(id<RecvTransportListener>)listener id:(NSString *)id iceParameters:(NSString *)iceParameters iceCandidates:(NSString *)iceCandidates dtlsParameters:(NSString *)dtlsParameters {
-    return [self createRecvTransport:listener id:id iceParameters:iceParameters iceCandidates:iceCandidates dtlsParameters:dtlsParameters sctpParameters:nil options:nil appData:nil];
-}
-
--(RecvTransport *)createRecvTransport:(id<RecvTransportListener>)listener id:(NSString *)id iceParameters:(NSString *)iceParameters iceCandidates:(NSString *)iceCandidates dtlsParameters:(NSString *)dtlsParameters sctpParameters:(NSString *)sctpParameters options:(RTCPeerConnectionFactoryOptions *)options appData:(NSString *)appData {
-    [self checkDeviceExists];
-    
-    NSObject *transport = [DeviceWrapper nativeCreateRecvTransport:self._nativeDevice listener:listener id:id iceParameters:iceParameters iceCandidates:iceCandidates dtlsParameters:dtlsParameters sctpParameters:sctpParameters options:options appData:appData];
-    
-    return [[RecvTransport alloc] initWithNativeTransport:transport];
-}
-
--(void)checkDeviceExists {
-    if (self._nativeDevice == nil) {
-        NSException* exception = [NSException exceptionWithName:@"IllegalStateException" reason:@"Device has been disposed." userInfo:nil];
-        
-        throw exception;
+-(SendTransport *)createSendTransport:(id<SendTransportListener>)listener id:(NSString *)id iceParameters:(NSString *)iceParameters iceCandidates:(NSString *)iceCandidates dtlsParameters:(NSString *)dtlsParameters sctpParameters:(NSString *)sctpParameters options:(RTCPeerConnectionFactoryOptions *)options appData:(NSString *)appData error:(NSError **)errPtr {
+  if (![self deviceExists]) {
+    if (errPtr) {
+      *errPtr = [NSError errorWithDomain:ERR_DOMAIN code:NativeDisposedError userInfo:nil];
     }
+    return nil;
+  }
+
+  if (![self isLoaded]) {
+    if (errPtr) {
+      *errPtr = [NSError errorWithDomain:ERR_DOMAIN code:NotLoadedError userInfo:nil];
+    }
+    return nil;
+  }
+
+  @try {
+    NSObject *transport = [DeviceWrapper nativeCreateSendTransport:self._nativeDevice listener:listener id:id iceParameters:iceParameters iceCandidates:iceCandidates dtlsParameters:dtlsParameters sctpParameters:sctpParameters options:options appData:appData];
+    return [[SendTransport alloc] initWithNativeTransport:transport];
+  }
+  @catch (NSException *exception) {
+    if (errPtr) {
+      *errPtr = [NSError errorWithDomain:ERR_DOMAIN code:RuntimeError userInfo:nil];
+    }
+    return nil;
+  }
+}
+
+-(RecvTransport *)createRecvTransport:(id<RecvTransportListener>)listener id:(NSString *)id iceParameters:(NSString *)iceParameters iceCandidates:(NSString *)iceCandidates dtlsParameters:(NSString *)dtlsParameters error:(NSError **)errPtr {
+  return [self createRecvTransport:listener id:id iceParameters:iceParameters iceCandidates:iceCandidates dtlsParameters:dtlsParameters sctpParameters:nil options:nil appData:nil error:errPtr];
+}
+
+-(RecvTransport *)createRecvTransport:(id<RecvTransportListener>)listener id:(NSString *)id iceParameters:(NSString *)iceParameters iceCandidates:(NSString *)iceCandidates dtlsParameters:(NSString *)dtlsParameters sctpParameters:(NSString *)sctpParameters options:(RTCPeerConnectionFactoryOptions *)options appData:(NSString *)appData error:(NSError **)errPtr {
+  if (![self deviceExists]) {
+    if (errPtr) {
+      *errPtr = [NSError errorWithDomain:ERR_DOMAIN code:NativeDisposedError userInfo:nil];
+    }
+    return nil;
+  }
+
+  if (![self isLoaded]) {
+    if (errPtr) {
+      *errPtr = [NSError errorWithDomain:ERR_DOMAIN code:NotLoadedError userInfo:nil];
+    }
+    return nil;
+  }
+
+  @try {
+    NSObject *transport = [DeviceWrapper nativeCreateRecvTransport:self._nativeDevice listener:listener id:id iceParameters:iceParameters iceCandidates:iceCandidates dtlsParameters:dtlsParameters sctpParameters:sctpParameters options:options appData:appData];
+    return [[RecvTransport alloc] initWithNativeTransport:transport];
+  }
+  @catch (NSException *exception) {
+    if (errPtr) {
+      *errPtr = [NSError errorWithDomain:ERR_DOMAIN code:RuntimeError userInfo:nil];
+    }
+    return nil;
+  }
+}
+
+-(bool)deviceExists {
+  return self._nativeDevice != nil;
 }
 
 @end

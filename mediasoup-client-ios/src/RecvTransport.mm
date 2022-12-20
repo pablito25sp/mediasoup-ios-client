@@ -7,47 +7,56 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "Error.h"
 #import "RecvTransport.h"
 #import "TransportWrapper.h"
 #import "Consumer.h"
 
 @implementation RecvTransport : Transport
 
+NSString * const ERR_DOMAIN = @"mediasup-client-ios.RecvTransport";
+
 -(instancetype)initWithNativeTransport:(NSObject *)nativeTransport {
-    self = [super initWithNativeTransport:nativeTransport];
-    if (self) {
-        self._nativeTransport = nativeTransport;
-    }
-    
-    return self;
+  self = [super initWithNativeTransport:nativeTransport];
+  if (self) {
+    self._nativeTransport = nativeTransport;
+  }
+  return self;
 }
 
 -(void)dispose {
-    [self checkTransportExists];
-    
+  if ([self transportExists]) {
     [TransportWrapper nativeFreeTransport:self._nativeTransport];
+  }
 }
 
--(Consumer *)consume:(id<ConsumerListener>)listener id:(NSString *)id producerId:(NSString *)producerId kind:(NSString *)kind rtpParameters:(NSString *)rtpParameters {
-    return [self consume:listener id:id producerId:producerId kind:kind rtpParameters:rtpParameters appData:nil];
+-(Consumer *)consume:(id<ConsumerListener>)listener id:(NSString *)id producerId:(NSString *)producerId kind:(NSString *)kind rtpParameters:(NSString *)rtpParameters error:(NSError **)errPtr {
+  return [self consume:listener id:id producerId:producerId kind:kind rtpParameters:rtpParameters appData:nil error:errPtr];
 }
 
--(Consumer *)consume:(id<ConsumerListener>)listener id:(NSString *)id producerId:(NSString *)producerId kind:(NSString *)kind rtpParameters:(NSString *)rtpParameters appData:(NSString *)appData {
-    [self checkTransportExists];
-    
+-(Consumer *)consume:(id<ConsumerListener>)listener id:(NSString *)id producerId:(NSString *)producerId kind:(NSString *)kind rtpParameters:(NSString *)rtpParameters appData:(NSString *)appData error:(NSError **)errPtr {
+  if (![self transportExists]) {
+    if (errPtr) {
+      *errPtr = [NSError errorWithDomain:ERR_DOMAIN code:NativeDisposedError userInfo:nil];
+    }
+    return nil;
+  }
+
+  @try {
     @synchronized(self) {
-        Consumer *consumer = [TransportWrapper nativeConsume:self._nativeTransport listener:listener id:id producerId:producerId kind:kind rtpParameters:rtpParameters appData:appData];
-        
-        return consumer;
+      return [TransportWrapper nativeConsume:self._nativeTransport listener:listener id:id producerId:producerId kind:kind rtpParameters:rtpParameters appData:appData];
     }
+  }
+  @catch (NSException *exception) {
+    if (errPtr) {
+      *errPtr = [NSError errorWithDomain:ERR_DOMAIN code:RuntimeError userInfo:nil];
+    }
+    return nil;
+  }
 }
 
--(void)checkTransportExists {
-    if (self._nativeTransport == nil) {
-        NSException* exception = [NSException exceptionWithName:@"IllegalStateException" reason:@"RecvTransport has been disposed." userInfo:nil];
-        
-        throw exception;
-    }
+-(bool)transportExists {
+  return self._nativeTransport != nil;
 }
 
 @end
